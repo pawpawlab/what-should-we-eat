@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: #e9e6e1; /* app 外围背景，衬托居中的手机布局 */
+  color: theme("colors.ink.DEFAULT");
+  font-family: theme("fontFamily.sans");
+  overscroll-behavior-y: none;
+}
+
+/* 禁止移动端点击高亮闪烁 */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 隐藏滚动条但保留滚动能力 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 关键交互按压反馈 */
+.press {
+  transition: transform 0.12s ease;
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+.price-range {
+  pointer-events: none;
+}
+
+.price-range::-webkit-slider-runnable-track {
+  height: 32px;
+  background: transparent;
+}
+
+.price-range::-webkit-slider-thumb {
+  pointer-events: auto;
+  height: 28px;
+  width: 28px;
+  margin-top: 2px;
+  appearance: none;
+  border: 3px solid #f45f49;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(36, 31, 28, 0.18);
+}
+
+.price-range::-moz-range-track {
+  height: 32px;
+  background: transparent;
+}
+
+.price-range::-moz-range-thumb {
+  pointer-events: auto;
+  height: 24px;
+  width: 24px;
+  border: 3px solid #f45f49;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(36, 31, 28, 0.18);
+}
