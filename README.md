@@ -11,13 +11,38 @@
 ## 快速开始
 
 ```bash
+# 1. 克隆（新电脑第一次）
+git clone https://github.com/pawpawlab/what-should-we-eat.git
+cd what-should-we-eat
+
+# 2. 安装依赖
 npm install
+
+# 3. 创建本地环境变量（⚠️ .env.local 不会进 Git，含密钥，每台电脑都要单独建一次）
+cp .env.example .env.local
+# 然后编辑 .env.local，填入下方「环境变量」表里的 4 个 Key
+# （可从另一台开发机的 .env.local 复制，或从 Vercel 项目设置里拿）
+
+# 4. 启动
 npm run dev
 ```
 
 打开 http://localhost:3000 （建议用浏览器移动端模拟器，基准宽度 390px）。
 
+> 未配置 Key 时项目也能跑：地图/餐厅接口会返回空状态，Room 自动回退到本地 `localStorage`。要体验真实餐厅推荐和跨设备同步，需按下方说明配置高德与 Supabase。
+
 餐厅与地点数据来自高德 Web 服务。未配置 Key 或接口无结果时，页面会展示空状态，不再使用虚拟餐厅兜底。
+
+### 多设备协作（换电脑继续开发）
+
+```bash
+git pull        # 开工前先拉最新
+# …coding…
+git add -A && git commit -m "说明" && git push   # 收工推送
+```
+
+> 只有代码通过 Git 同步；`.env.local`（密钥）和 `node_modules`、`.next` 构建产物都不会同步，
+> 新电脑按上面「快速开始」重新 `npm install` + 建 `.env.local` 即可。
 
 ### 双人流程怎么体验
 
