@@ -24,7 +24,7 @@ export function Chip({ label, selected, onClick, variant = "prefer" }: ChipProps
   if (!selected) {
     cls = "bg-surface text-ink-soft border border-line";
   } else if (variant === "prefer") {
-    cls = "bg-accent text-white border border-accent shadow-cta";
+    cls = "bg-accent text-white border border-accent";
   } else if (variant === "avoid") {
     cls = "bg-ink text-white border border-ink";
   } else {

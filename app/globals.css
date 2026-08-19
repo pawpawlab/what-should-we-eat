@@ -61,7 +61,6 @@ body {
   border: 3px solid #f45f49;
   border-radius: 999px;
   background: #fff;
-  box-shadow: 0 8px 18px rgba(36, 31, 28, 0.18);
 }
 
 .price-range::-moz-range-track {
@@ -76,5 +75,4 @@ body {
   border: 3px solid #f45f49;
   border-radius: 999px;
   background: #fff;
-  box-shadow: 0 8px 18px rgba(36, 31, 28, 0.18);
 }

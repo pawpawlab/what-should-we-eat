@@ -2,8 +2,6 @@
 
 import { useMemo, useRef, useState } from "react";
 import { Chip } from "@/components/Chip";
-import { Button } from "@/components/Button";
-import { BottomAction } from "@/components/BottomAction";
 import {
   FOOD_CATEGORIES,
   PREFERENCE_TAGS,
@@ -17,6 +15,8 @@ interface PreferenceFormProps {
   initial?: UserPreference;
   submitLabel?: string;
   onSubmit: (pref: UserPreference) => void;
+  /** 朋友是否已选好偏好（用于按钮上方的状态提示） */
+  friendDone?: boolean;
 }
 
 function Section({
@@ -29,9 +29,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mb-7">
-      <h2 className="text-[19px] font-bold text-ink">{title}</h2>
-      {hint && <p className="mt-1 text-sm text-ink-faint">{hint}</p>}
+    <section className="mb-8">
+      <h2 className="text-[18px] font-medium text-ink">{title}</h2>
+      {hint && <p className="mt-1 text-[14px] text-[#6A6A6A]">{hint}</p>}
       <div className="mt-3 flex flex-wrap gap-2.5">{children}</div>
     </section>
   );
@@ -59,6 +59,7 @@ export function PreferenceForm({
   initial,
   submitLabel = "选好了",
   onSubmit,
+  friendDone = false,
 }: PreferenceFormProps) {
   const [pref, setPref] = useState<UserPreference>({
     ...emptyPreference(),
@@ -218,9 +219,9 @@ export function PreferenceForm({
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto px-5 pb-4 no-scrollbar">
-        <section className="mb-7">
-          <h2 className="text-[19px] font-bold text-ink">想吃什么</h2>
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-24 no-scrollbar [&>section:last-child]:mb-0">
+        <section className="mb-8 pt-8">
+          <h2 className="text-[18px] font-medium text-ink">想吃什么？</h2>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <DropBox
               title="想吃"
@@ -238,9 +239,9 @@ export function PreferenceForm({
 
           <div
             data-drop-target="neutral"
-            className="mt-3 rounded-2xl border border-line bg-surface px-3 py-3 shadow-card"
+            className="mt-3 rounded-[20px] bg-white p-6 shadow-[0_0_0.5px_0_rgba(0,0,0,0.25)]"
           >
-            <div className="mb-3 text-center text-sm font-semibold text-ink-faint">
+            <div className="mb-3 text-center text-[14px] text-[#6A6A6A]">
               都可以
             </div>
             <div className="flex flex-wrap justify-center gap-2">
@@ -249,13 +250,13 @@ export function PreferenceForm({
                   key={`${tag.kind}-${tag.label}`}
                   type="button"
                   {...dragHandlers(tag)}
-                  className="press min-h-[40px] select-none touch-none rounded-bubble border border-line bg-surface px-3 text-[14px] font-medium text-ink-soft transition-colors"
+                  className="press min-h-[40px] select-none touch-none rounded-bubble border border-line bg-white px-3 text-[14px] text-[#6A6A6A] transition-colors"
                 >
                   {tag.label}
                 </button>
               ))}
               {neutralTags.length === 0 && (
-                <span className="py-2 text-[13px] text-ink-faint">
+                <span className="py-2 text-[13px] text-[#6A6A6A]">
                   都拖走啦，长按筐里的标签可以拖回来
                 </span>
               )}
@@ -267,7 +268,7 @@ export function PreferenceForm({
           <PriceRangeSlider value={priceRange} onChange={updatePriceRange} />
         </Section>
 
-        <Section title="偏好一点什么？" hint="这些会影响排序，不是绝对底线">
+        <Section title="偏好一点什么？">
           {PREFERENCE_TAGS.map((c) => (
             <Chip
               key={c}
@@ -280,11 +281,29 @@ export function PreferenceForm({
         </Section>
       </div>
 
-      <BottomAction>
-        <Button onClick={() => onSubmit(pref)}>
+      {/* 底部提交（对齐首页：#F6F6F6 渐隐、两边 36、黑色全圆角胶囊、18px medium） */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-30 px-6 pt-10"
+        style={{
+          paddingBottom: "calc(20px + env(safe-area-inset-bottom))",
+          background:
+            "linear-gradient(to top,#F6F6F6 55%,rgba(246,246,246,0.85) 78%,rgba(246,246,246,0))",
+        }}
+      >
+        {/* 朋友选择状态（按钮正上方 16px） */}
+        <div className="mb-4 flex items-center justify-center gap-2 text-[14px] text-[#6A6A6A]">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-cream-soft text-[16px]">
+            🥳
+          </span>
+          <span>{friendDone ? "朋友选好啦 ✅" : "朋友也正在选择中…"}</span>
+        </div>
+        <button
+          onClick={() => onSubmit(pref)}
+          className="press pointer-events-auto flex h-[64px] w-full items-center justify-center rounded-full bg-ink text-[18px] font-medium text-white transition-opacity active:opacity-90"
+        >
           {submitLabel}
-        </Button>
-      </BottomAction>
+        </button>
+      </div>
 
       {drag && (
         <div
@@ -319,10 +338,9 @@ function PriceRangeSlider({
       : `${priceLabel(value.min)} - ${priceLabel(value.max)}`;
 
   return (
-    <div className="w-full rounded-2xl border border-line bg-surface px-4 py-4 shadow-card">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-ink-faint">人均范围</span>
-        <span className="text-[17px] font-bold text-ink">{label}</span>
+    <div className="w-full rounded-[20px] bg-white p-6 shadow-[0_0_0.5px_0_rgba(0,0,0,0.25)]">
+      <div>
+        <span className="text-[17px] text-ink">{label}</span>
       </div>
 
       <div className="relative mt-6 h-8">
@@ -357,7 +375,7 @@ function PriceRangeSlider({
         />
       </div>
 
-      <div className="mt-1 flex justify-between text-xs font-semibold text-ink-faint">
+      <div className="mt-1 flex justify-between text-xs text-[#6A6A6A]">
         <span>¥0</span>
         <span>¥100</span>
         <span>¥200</span>
@@ -382,15 +400,13 @@ function DropBox({
     <div
       data-drop-target={side}
       className={cx(
-        "min-h-[132px] rounded-2xl border px-3 py-3 shadow-card transition-colors",
-        side === "want"
-          ? "border-accent/30 bg-accent-soft/60"
-          : "border-ink/15 bg-surface"
+        "min-h-[132px] rounded-[20px] p-6 shadow-[0_0_0.5px_0_rgba(0,0,0,0.25)] transition-colors",
+        side === "want" ? "bg-accent-soft/60" : "bg-white"
       )}
     >
       <div
         className={cx(
-          "mb-2 text-center text-sm font-bold",
+          "mb-2 text-center text-[14px] font-medium",
           side === "want" ? "text-accent" : "text-ink"
         )}
       >
@@ -403,7 +419,7 @@ function DropBox({
             type="button"
             {...dragHandlers(tag)}
             className={cx(
-              "min-h-[34px] select-none touch-none rounded-bubble px-3 text-[13px] font-semibold",
+              "min-h-[34px] select-none touch-none rounded-bubble px-3 text-[13px] font-medium",
               side === "want" ? "bg-accent text-white" : "bg-ink text-white"
             )}
           >

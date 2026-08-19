@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Chip } from "@/components/Chip";
 import { InviteSheet } from "@/components/InviteSheet";
-import { DEFAULT_RADIUS, RADIUS_OPTIONS } from "@/config/options";
+import { RadiusSlider } from "@/components/RadiusSlider";
+import { GlowBackground } from "@/components/GlowBackground";
 import {
   getDraft,
   patchDraft,
@@ -24,7 +24,8 @@ export default function HomePage() {
   const router = useRouter();
 
   const [location, setLocation] = useState<LocationInfo | null>(null);
-  const [radius, setRadius] = useState<number>(DEFAULT_RADIUS);
+  // 默认最近档 500m（对齐设计稿）
+  const [radius, setRadius] = useState<number>(500);
 
   // 地址搜索
   const [query, setQuery] = useState("");
@@ -209,20 +210,25 @@ export default function HomePage() {
   const canInvite = !!location;
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-cream">
-      <div className="flex-1 overflow-y-auto px-5 pb-4 no-scrollbar">
+    <div className="relative flex min-h-[100dvh] flex-col bg-[#F6F6F6]">
+      <GlowBackground />
+
+      <div className="relative z-10 flex-1 overflow-y-auto px-[36px] pb-4 no-scrollbar">
         {/* 头部区 */}
-        <div className="pt-12 text-center">
-          <div className="text-[40px] leading-none">👀</div>
-          <h1 className="mt-3 text-[24px] font-extrabold text-ink">
-            正在纠结两个人吃啥？
+        <div className="pt-[120px]">
+          <div className="text-[44px] leading-none">👀</div>
+          <h1 className="mt-4 text-[24px] font-semibold text-ink">
+            你俩正在纠结吃什么？
           </h1>
         </div>
 
         {/* 卡片 1：选地址 */}
-        <div className="mt-8 rounded-3xl bg-surface p-5 shadow-warm">
-          <div className="text-[15px] font-bold text-ink">在哪附近吃？</div>
-          <div className="mt-3 flex items-center gap-2.5">
+        <div className="mt-10 rounded-[20px] bg-white p-6 shadow-[0_0_0.5px_0_rgba(0,0,0,0.25)]">
+          <div className="flex items-center gap-1.5 text-[14px] text-[#6A6A6A]">
+            <span>📍</span>
+            <span>你们位于...</span>
+          </div>
+          <div className="mt-4 flex h-[50px] items-center rounded-lg bg-[#FAFAFA] pl-5 pr-1.5">
             <input
               value={searching ? query : location ? location.name : query}
               onFocus={() => {
@@ -230,14 +236,19 @@ export default function HomePage() {
                 setQuery("");
               }}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="搜索商圈、地铁站或地址"
-              className="min-w-0 flex-1 rounded-2xl border border-line bg-cream/40 px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-faint focus:border-accent"
+              placeholder="点击输入位置"
+              className="min-w-0 flex-1 bg-transparent text-[18px] text-ink outline-none placeholder:text-ink-faint"
             />
             <button
+              aria-label="定位当前位置"
               onClick={useCurrentLocation}
-              className="press shrink-0 rounded-2xl bg-ink px-3.5 py-3 text-[13px] font-semibold text-white active:opacity-90"
+              className="press flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-md bg-white shadow-[0_0_0.5px_0_rgba(0,0,0,0.25)] active:bg-line/40"
             >
-              {locating ? "定位中…" : "定位当前位置"}
+              {locating ? (
+                <span className="text-[12px] text-ink-faint">…</span>
+              ) : (
+                <LocateIcon />
+              )}
             </button>
           </div>
 
@@ -260,7 +271,7 @@ export default function HomePage() {
                   }}
                   className="press flex w-full flex-col items-start border-b border-line bg-surface px-4 py-3 text-left last:border-0 active:bg-cream/60"
                 >
-                  <span className="font-medium text-ink">{p.name}</span>
+                  <span className="text-ink">{p.name}</span>
                   <span className="text-[13px] text-ink-faint">{p.area}</span>
                 </button>
               ))}
@@ -268,39 +279,34 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* 卡片 2：想走多远 */}
-        <div className="mt-4 rounded-3xl bg-surface p-5 shadow-warm">
-          <div className="text-[15px] font-bold text-ink">可以接受走多远？</div>
-          <div className="mt-3 flex flex-wrap gap-2.5">
-            {RADIUS_OPTIONS.map((o) => (
-              <Chip
-                key={o.value}
-                label={o.label}
-                selected={radius === o.value}
-                onClick={() => setRadius(o.value)}
-              />
-            ))}
+        {/* 卡片 2：距离可以接受 */}
+        <div className="mt-4 rounded-[20px] bg-white p-6 shadow-[0_0_0.5px_0_rgba(0,0,0,0.25)]">
+          <div className="mb-4 flex items-center gap-1.5 text-[14px] text-[#6A6A6A]">
+            <span>🚶</span>
+            <span>距离可以接受...</span>
           </div>
-          <p className="mt-2.5 text-[13px] text-ink-faint">
-            {RADIUS_OPTIONS.find((o) => o.value === radius)?.hint}
-          </p>
+          <RadiusSlider value={radius} onChange={setRadius} />
         </div>
       </div>
 
       {/* 底部按钮区 */}
       <div
-        className="sticky bottom-0 z-20 mt-auto bg-gradient-to-t from-cream via-cream to-transparent px-5 pt-4"
-        style={{ paddingBottom: "calc(16px + env(safe-area-inset-bottom))" }}
+        className="sticky bottom-0 z-20 mt-auto px-[36px] pt-4"
+        style={{
+          paddingBottom: "calc(20px + env(safe-area-inset-bottom))",
+          background:
+            "linear-gradient(to top,#F6F6F6 65%,rgba(246,246,246,0))",
+        }}
       >
         <button
           disabled={!canInvite || creating}
           onClick={invite}
-          className="press flex h-[55px] w-full items-center justify-center rounded-2xl bg-ink text-[16px] font-bold text-white transition-opacity disabled:opacity-40"
+          className="press flex h-[64px] w-full items-center justify-center rounded-full bg-ink text-[18px] font-medium text-white transition-opacity disabled:opacity-40"
         >
-          {creating ? "创建中…" : canInvite ? "邀请朋友，填写各自偏好" : "先选个位置"}
+          {creating ? "创建中…" : canInvite ? "邀请朋友 填写各自偏好" : "先选个位置"}
         </button>
-        <p className="mt-2.5 text-center text-[14px] text-ink-faint">
-          双方填写完成后，自动推荐餐厅～
+        <p className="mt-3 text-center text-[14px] text-[#6A6A6A]">
+          综合二人偏好推荐餐厅~
         </p>
       </div>
 
@@ -313,5 +319,21 @@ export default function HomePage() {
         copied={copied}
       />
     </div>
+  );
+}
+
+/** 定位准星图标（橙色） */
+function LocateIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="5" stroke="#F5821F" strokeWidth="2" />
+      <circle cx="12" cy="12" r="1.8" fill="#F5821F" />
+      <path
+        d="M12 2v3M12 19v3M2 12h3M19 12h3"
+        stroke="#F5821F"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }

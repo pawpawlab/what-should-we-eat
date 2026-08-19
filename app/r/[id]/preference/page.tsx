@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PreferenceForm } from "@/features/preference/PreferenceForm";
-import { PreferenceHeader } from "@/components/PreferenceHeader";
+import { GlowBackground } from "@/components/GlowBackground";
 import { getRoomRepository } from "@/lib/room/repository";
 import { rememberRoomAccess } from "@/lib/room/access";
 import { useRoom } from "@/features/room/useRoom";
@@ -37,23 +37,29 @@ export default function GuestPreferencePage({
   };
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-cream">
-      <PreferenceHeader roomId={params.id} role="guest" />
-      <div className="px-5 pt-4">
-        <div className="flex items-end justify-between gap-3">
-          <h1 className="text-title text-ink">选择你的偏好</h1>
-          {addressName && (
-            <span className="mb-1 max-w-[45%] truncate text-right text-[13px] text-ink-faint">
-              📍 {addressName}
-            </span>
-          )}
+    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-[#F6F6F6]">
+      <GlowBackground />
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col">
+        <div
+          className="shrink-0 px-6"
+          style={{ paddingTop: "calc(env(safe-area-inset-top) + 24px)" }}
+        >
+          <div className="flex items-end justify-between gap-3">
+            <h1 className="text-[24px] font-semibold text-ink">选择你的偏好</h1>
+            {addressName && (
+              <span className="mb-1 max-w-[45%] truncate text-right text-[14px] text-[#6A6A6A]">
+                📍 {addressName}
+              </span>
+            )}
+          </div>
+          <p className="mt-1 text-[14px] text-[#6A6A6A]">
+            双方都选择完成后自动匹配
+          </p>
         </div>
-        <p className="mt-1 text-sm text-ink-faint">双方都选择完成后自动匹配</p>
-      </div>
-      <div className="mt-3 flex flex-1 flex-col">
         <PreferenceForm
           submitLabel={saving ? "提交中…" : "选好了"}
           onSubmit={submit}
+          friendDone={!!room?.hostPreference}
         />
       </div>
     </div>
