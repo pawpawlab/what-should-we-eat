@@ -1,6 +1,8 @@
 export {
   recommend,
+  recommendTop,
   buildReason,
+  buildReasonTag,
   scoreRestaurants,
   passesHardFilter,
   computeUserScore,

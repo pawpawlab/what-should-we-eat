@@ -1,6 +1,10 @@
 import type { DiningRoom, Restaurant } from "@/types";
 import { loadNearbyRestaurants } from "@/lib/restaurant-provider/client";
-import { recommend, type RecommendResult } from "@/lib/recommendation-engine";
+import {
+  recommend,
+  recommendTop,
+  type RecommendResult,
+} from "@/lib/recommendation-engine";
 
 const cacheKey = (roomId: string) => `jcz:restaurants:v3:${roomId}`;
 
@@ -68,5 +72,23 @@ export function computeNext(
       excludeIds: room.rejectedRestaurantIds,
     },
     room.radius
+  );
+}
+
+/** 结果页卡片堆：一次算出前 N 个候选（默认 3 个） */
+export function computeTop(
+  room: DiningRoom,
+  restaurants: Restaurant[],
+  n = 3
+): RecommendResult[] {
+  if (!room.hostPreference || !room.guestPreference) return [];
+  return recommendTop(
+    {
+      restaurants,
+      host: room.hostPreference,
+      guest: room.guestPreference,
+    },
+    room.radius,
+    n
   );
 }

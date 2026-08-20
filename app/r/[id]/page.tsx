@@ -84,14 +84,18 @@ export default function GuestEntryPage({ params }: { params: { id: string } }) {
         <button
           onClick={() =>
             guestDone
-              ? router.push(`/matching?room=${room.id}&role=guest`)
+              ? router.push(`/invite?room=${room.id}&role=guest`)
               : router.push(
                   `/r/${room.id}/preference${token ? `?token=${encodeURIComponent(token)}` : ""}`
                 )
           }
           className="press flex h-[64px] w-full items-center justify-center rounded-full bg-ink text-[18px] font-medium text-white transition-opacity active:opacity-90"
         >
-          {guestDone ? "看看结果" : "选一下我的口味"}
+          {guestDone
+            ? room.hostPreference
+              ? "看看结果"
+              : "看看进度"
+            : "选一下我的口味"}
         </button>
       </div>
     </div>

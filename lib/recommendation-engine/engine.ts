@@ -386,3 +386,41 @@ export function recommend(
     remaining: scored.length,
   };
 }
+
+/**
+ * 一次返回得分最高的前 N 个候选（结果页卡片堆用）。
+ * 候选不足时返回实际数量，完全没有则返回空数组。
+ */
+export function recommendTop(
+  input: RecommendInput,
+  radius = 3000,
+  n = 3
+): RecommendResult[] {
+  const scored = scoreRestaurants(input, radius);
+  return scored.slice(0, n).map((s) => ({
+    restaurant: s.restaurant,
+    reason: buildReason(s.restaurant, input.host, input.guest, radius),
+    remaining: scored.length,
+  }));
+}
+
+/**
+ * 卡片上的简短推荐理由标签。
+ * 只保留「你们都想吃 / 其中一人想吃」这类正向理由，
+ * 不展示「帮你们避开了什么」等其他信息。
+ */
+export function buildReasonTag(reason: RecommendReason): string {
+  if (reason.bothWant.length > 0) {
+    const cat = reason.bothWant[0];
+    return reason.categoryMatchScope === "both"
+      ? `你们都想吃${cat}`
+      : `其中一人想吃${cat}`;
+  }
+  if (reason.matchedTastes.length > 0) {
+    const taste = reason.matchedTastes[0];
+    return reason.tasteMatchScope === "both"
+      ? `你们都想吃${taste}的`
+      : `其中一人想吃${taste}的`;
+  }
+  return "综合下来最合适";
+}

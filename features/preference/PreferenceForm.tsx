@@ -219,7 +219,7 @@ export function PreferenceForm({
 
   return (
     <>
-      <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-24 no-scrollbar [&>section:last-child]:mb-0">
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-56 no-scrollbar [&>section:last-child]:mb-0">
         <section className="mb-8 pt-8">
           <h2 className="text-[18px] font-medium text-ink">想吃什么？</h2>
           <div className="mt-3 grid grid-cols-2 gap-3">

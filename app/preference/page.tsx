@@ -40,10 +40,10 @@ function HostPreferenceInner() {
     track("preference_submitted", { role: "host" });
     const repo = getRoomRepository();
 
-    // 新流程：房间已存在，更新 hostPreference
+    // 新流程：房间已存在，更新 hostPreference → 等待页
     if (roomId) {
       await repo.updateRoom(roomId, { hostPreference: pref });
-      router.push(`/invite?room=${roomId}`);
+      router.push(`/invite?room=${roomId}&role=host`);
       return;
     }
 
@@ -55,7 +55,7 @@ function HostPreferenceInner() {
       radius: draft.radius ?? 2000,
       hostPreference: pref,
     });
-    router.push(`/invite?room=${room.id}`);
+    router.push(`/invite?room=${room.id}&role=host`);
   };
 
   if (!ready) return <div className="min-h-[100dvh] bg-[#F6F6F6]" />;

@@ -4,7 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { getRoomRepository } from "@/lib/room/repository";
-import { ensureRestaurants, computeNext } from "@/features/matching/recommendation-client";
+import { ensureRestaurants, computeTop } from "@/features/matching/recommendation-client";
 import { track } from "@/lib/analytics";
 
 const MESSAGES = [
@@ -65,13 +65,14 @@ function MatchingInner() {
         room.hostPreference &&
         room.guestPreference
       ) {
-        const rec = computeNext(room, restaurants);
-        if (rec) {
+        // 一次算出 3 个候选，存进房间，保证双方看到同样的卡片
+        const top = computeTop(room, restaurants, 3);
+        if (top.length > 0) {
           await repo.updateRoom(room.id, {
-            recommendedRestaurantIds: [rec.restaurant.id],
+            recommendedRestaurantIds: top.map((x) => x.restaurant.id),
             status: "result",
           });
-          track("restaurant_shown", { id: rec.restaurant.id });
+          track("restaurant_shown", { id: top[0].restaurant.id });
         } else {
           await repo.updateRoom(room.id, { status: "result" });
           track("zero_result");

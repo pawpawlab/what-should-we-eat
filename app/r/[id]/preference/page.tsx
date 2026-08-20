@@ -28,12 +28,9 @@ export default function GuestPreferencePage({
     setSaving(true);
     track("preference_submitted", { role: "guest" });
     const repo = getRoomRepository();
-    // 双方完成 → 直接进入匹配（会通知 Host 端）
-    await repo.updateRoom(params.id, {
-      guestPreference: pref,
-      status: "matching",
-    });
-    router.push(`/matching?room=${params.id}&role=guest`);
+    // 提交自己的偏好 → 进入等待页（双方都填完后自动进入匹配）
+    await repo.updateRoom(params.id, { guestPreference: pref });
+    router.push(`/invite?room=${params.id}&role=guest`);
   };
 
   return (
